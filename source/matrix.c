@@ -8,6 +8,7 @@
 /* LED Matrix state */
 led_t ledColors[KEY_COUNT];
 led_t ledMask[KEY_COUNT];
+led_t bleMask[4];
 
 bool needToCallbackProfile = false;
 bool matrixEnabled;
@@ -117,9 +118,17 @@ static inline void pwmNextColumn() {
   rowsEnabled = 0;
   for (size_t keyRow = 0; keyRow < NUM_ROW; keyRow++) {
     const uint8_t ledIndex = ROWCOL2IDX(keyRow, currentColumn);
+    int8_t bleIndex = -1;
     led_t cl;
+
+    /* Check for indicators */
+    if (keyRow == 0 && currentColumn >= 1 && currentColumn <= 4) {
+      bleIndex = currentColumn - 1;
+    }
     /* TODO: Maybe... weight with alpha? */
-    if (ledMask[ledIndex].p.alpha) {
+    if (bleIndex >= 0 && bleMask[bleIndex].p.alpha) {
+      cl = bleMask[bleIndex];
+    } else if (ledMask[ledIndex].p.alpha) {
       cl = ledMask[ledIndex];
     } else {
       cl = ledColors[ledIndex];

@@ -146,13 +146,12 @@ struct {
 static THD_FUNCTION(blinkerFun, arg) {
   (void)arg;
   uint8_t on = 1;
-
+  const uint8_t bleIndex = blinker.col - 1;
   for (; blinker.times > 0 && blinker.running; blinker.times--) {
     if (on)
-      setKeyColor(&ledMask[ROWCOL2IDX(blinker.row, blinker.col)],
-                  blinker.color.rgb);
+      setKeyColor(&bleMask[bleIndex], blinker.color.rgb);
     else
-      setKeyColor(&ledMask[ROWCOL2IDX(blinker.row, blinker.col)], 0xff000000);
+      setKeyColor(&bleMask[bleIndex], 0xff000000);
     on ^= 0x01;
 
     for (uint32_t i = 0; i < blinker.hundredths && blinker.running; i++) {
@@ -160,7 +159,7 @@ static THD_FUNCTION(blinkerFun, arg) {
       chThdSleepMilliseconds(10);
     }
   }
-  setKeyColor(&ledMask[ROWCOL2IDX(blinker.row, blinker.col)], 0x00);
+  setKeyColor(&bleMask[bleIndex], 0x00);
 }
 
 /* Prepare thread data and schedule a blinking thread */
